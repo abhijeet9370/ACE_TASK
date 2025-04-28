@@ -1,0 +1,52 @@
+
+CREATE COMPUTE MODULE FLOW_Compute
+    CREATE FUNCTION Main() RETURNS BOOLEAN
+    BEGIN
+        DECLARE char_data CHARACTER;
+        DECLARE encryptedData CHARACTER;
+        DECLARE decryptedData CHARACTER;
+        DECLARE signedData CHARACTER;
+        DECLARE isSignatureValid CHARACTER;
+        
+        -- Convert input message to string
+        --SET char_data = CAST(ASBITSTREAM(InputRoot.JSON.Data) AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+        SET char_data=CAST(ASBITSTREAM(InputRoot.JSON.Data) AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+        -- Sign the original message with RSA private key
+        CALL signData(char_data) INTO signedData;
+        
+        -- Encrypt the original message using AES
+        CALL getEncryptedData(signedData) INTO encryptedData;
+        
+        -- Decrypt the encrypted data using AES
+        CALL getDecryptedData(encryptedData) INTO decryptedData;
+        
+        -- Verify the signature with RSA public key
+        CALL verifySignature(char_data, signedData) INTO isSignatureValid;
+        
+        
+        -- Set output to show the encrypted data, decrypted data, and signature validity
+        SET OutputRoot.JSON.Data.encryptedData = encryptedData;
+        SET OutputRoot.JSON.Data.decryptedData = decryptedData;
+        SET OutputRoot.JSON.Data.signedData = signedData;
+        SET OutputRoot.JSON.Data.signatureValid = isSignatureValid;
+        
+        RETURN TRUE;
+    END;
+END MODULE;
+
+
+CREATE PROCEDURE getEncryptedData(IN char_data CHARACTER) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "sample.Demo.getEncryptedData"; 
+
+CREATE PROCEDURE getDecryptedData(IN encryptedData CHARACTER) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "sample.Demo.getDecryptedData";
+
+CREATE PROCEDURE signData(IN char_data CHARACTER) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "sample.Demo.signData";
+
+CREATE PROCEDURE verifySignature(IN char_data CHARACTER, IN signedData CHARACTER) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "sample.Demo.verifySignature";
