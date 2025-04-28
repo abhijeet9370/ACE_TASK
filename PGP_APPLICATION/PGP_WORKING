@@ -1,0 +1,57 @@
+
+-----------Working Of PGP----------------
+
+🔐 1. Key Generation
+	Each user creates:
+
+	A public key (shared with others)
+
+	A private key (kept secret)
+
+	These are used for asymmetric encryption (e.g., RSA or ECC).
+
+📤 2. Encrypting a Message
+	When Alice wants to send a secure message to Bob:
+
+	a. Message is compressed
+	To reduce size and add a bit of security.
+
+	b. A random session key is generated
+	A one-time symmetric key (e.g., AES) is created.
+
+	The message is encrypted using this fast symmetric key.
+
+	c. Session key is encrypted with Bob's public key
+	The encrypted session key is sent along with the message.
+
+	So the final package includes:
+
+	Encrypted message
+
+	Encrypted session key
+
+📥 3. Decrypting a Message
+	When Bob receives the message:
+
+	a. Decrypts the session key
+	Bob uses his private key to decrypt the session key.
+
+	b. Decrypts the message
+	Uses the decrypted session key to decrypt the message content.
+
+✍️ 4. Digital Signature (Optional, but common)
+	If Alice wants to prove she sent the message:
+
+	a. Hash the message
+	Create a digest (e.g., SHA-256)
+
+	b. Encrypt the hash with her private key
+	This becomes her digital signature
+
+	c. Attach signature to the message
+	So Bob can verify it
+
+d. Verification
+	Bob decrypts the signature with Alice's public key
+
+	Compares it to the message hash to check authenticity and integrity
