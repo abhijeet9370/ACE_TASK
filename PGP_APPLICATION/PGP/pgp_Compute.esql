@@ -1,0 +1,131 @@
+
+/*
+CREATE COMPUTE MODULE pgp_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		-- SET OutputRoot = InputRoot;
+
+		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
+		DECLARE digitalSign,sessionKey,encryptedData,encSessionKey,verify CHARACTER;
+
+		DECLARE inReq CHARACTER;
+		SET inReq = CAST(ASBITSTREAM(inRef) AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+		-- DECLARE inReq CHARACTER CAST(inRef AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+
+		CALL signature (inReq) INTO digitalSign;
+		CALL encryptData (inReq) INTO encryptedData;
+		CALL getSessionKey() INTO sessionKey;
+		CALL getEncryptedSessionKey() INTO encSessionKey;
+
+		CALL verifyData(inReq,digitalSign) INTO verify;
+		-- SET OutputRoot.JSON.Data.digitalSign = digitalSign;
+		-- SET OutputRoot.JSON.Data.encryptedData = encryptedData ;
+		-- SET OutputRoot.JSON.Data.sessionKey = sessionKey ;
+		-- SET OutputRoot.JSON.Data.encSessionKey = encSessionKey ;
+
+		CREATE FIELD OutputRoot.JSON.Data;
+		DECLARE outRef REFERENCE TO OutputRoot.JSON.Data;
+
+		SET outRef = inRef;
+		SET outRef.signature = digitalSign;
+		SET outRef.encryptedData = encryptedData;
+		SET outRef.encSessionKey = encSessionKey;
+		SET outRef.verify = verify;
+
+
+
+	END;
+END MODULE;
+
+
+CREATE PROCEDURE signature ( In Request CHARACTER) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.main.pgp.PGP.digitalSign";
+
+CREATE PROCEDURE encryptData (IN Request CHARACTER ) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.main.pgp.PGP.getEncryptedData";
+
+CREATE PROCEDURE getSessionKey () RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.main.pgp.PGP.getSecretKeyBase64";
+
+CREATE PROCEDURE getEncryptedSessionKey () RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.main.pgp.PGP.encryptSessionKey";
+
+CREATE PROCEDURE verifyData (IN Request CHARACTER ,IN digitalSign CHARACTER ) RETURNS BOOLEAN
+LANGUAGE JAVA
+EXTERNAL NAME "com.main.pgp.PGP.verifyHash";
+
+*/
+
+
+CREATE COMPUTE MODULE pgp_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		-- SET OutputRoot = InputRoot;
+
+		DECLARE inRef REFERENCE TO InputRoot.JSON.Data;
+		DECLARE digitalSign,sessionKey,encryptedData,encSessionKey,verify CHARACTER;
+
+		DECLARE inReq CHARACTER;
+		SET inReq = CAST(ASBITSTREAM(inRef) AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+		-- DECLARE inReq CHARACTER CAST(inRef AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+
+		CALL signature (inReq) INTO digitalSign;
+		CALL encryptData (inReq) INTO encryptedData;
+		CALL getSessionKey() INTO sessionKey;
+		CALL getEncryptedSessionKey() INTO encSessionKey;
+
+		CALL verifyData(inReq,digitalSign) INTO verify;
+		-- SET OutputRoot.JSON.Data.digitalSign = digitalSign;
+		-- SET OutputRoot.JSON.Data.encryptedData = encryptedData ;
+		-- SET OutputRoot.JSON.Data.sessionKey = sessionKey ;
+		-- SET OutputRoot.JSON.Data.encSessionKey = encSessionKey ;
+
+		CREATE FIELD OutputRoot.JSON.Data;
+		DECLARE outRef REFERENCE TO OutputRoot.JSON.Data;
+
+		SET outRef = inRef;
+		SET outRef.signature = digitalSign;
+		SET outRef.encryptedData = encryptedData;
+		SET outRef.encSessionKey = encSessionKey;
+		SET outRef.verify = verify;
+
+
+
+	END;
+END MODULE;
+
+
+CREATE PROCEDURE signature ( In Request CHARACTER) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.ap.pgp.PGP.digitalSign";
+
+CREATE PROCEDURE encryptData (IN Request CHARACTER ) RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.ap.pgp.PGP.getEncryptedData";
+
+CREATE PROCEDURE getSessionKey () RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.ap.pgp.PGP.getSecretKeyBase64";
+
+CREATE PROCEDURE getEncryptedSessionKey () RETURNS CHARACTER
+LANGUAGE JAVA
+EXTERNAL NAME "com.ap.pgp.PGP.encryptSessionKey";
+
+CREATE PROCEDURE verifyData (IN Request CHARACTER ,IN digitalSign CHARACTER ) RETURNS BOOLEAN
+LANGUAGE JAVA
+EXTERNAL NAME "com.ap.pgp.PGP.verifyHash";
+
